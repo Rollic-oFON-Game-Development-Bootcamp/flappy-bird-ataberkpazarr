@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
+using UnityEngine.SceneManagement;
 
 public class Bird : MonoBehaviour
 {
@@ -12,70 +13,49 @@ public class Bird : MonoBehaviour
     [SerializeField] private GameObject pressKeyText;
     [SerializeField] private GameObject gameOverPanel;
     [SerializeField] private GameObject winPanel;
-    //[SerializeField] private GameObject teleportationGate;
-
-
+    bool congratulations = false; 
 
 
     //ToDo:
     //level progress bar, rotating obstacles,teleportation
-
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
     }
 
-    // Update is called once per frame
     void Update()
     {
-        if (gameStarted && !gameOver && !TeleportationOccured)
+        if (gameStarted && !gameOver  )
         {
-
-
             if (Input.GetKeyDown("space"))
             {
-
-
                 rb.velocity = Vector2.up * 100f;
-
             }
 
             transform.DOMoveX(transform.position.x + 5f, 0.3f).SetEase(Ease.Linear);
         }
 
-        else if (Input.GetKeyDown("space") && !gameOver)
+
+        else if (Input.GetKeyDown("space") && !gameOver )
         {
             pressKeyText.SetActive(false);
             gameStarted = true;
             rb.bodyType = RigidbodyType2D.Dynamic;
             rb.velocity = Vector2.up * 30f;
 
-            if (TeleportationOccured)
-            {
-                TeleportationOccured = false;
-            }
         }
 
-        if (transform.position.y < -50.5f || transform.position.y > 57.5f)
+
+        if (transform.position.y < -50.5f || transform.position.y > 57.5f &&!congratulations)
         {
             GameOver();
         }
 
-        
-
-
     }
 
-    private void OnEnable()
-    {
-        TeleportationHandler.teleportationOccured += HandleTeleportation;
-    }
-
-    private void HandleTeleportation(Vector3 vec)
-    {
-        //TeleportationOccured = true;
-    }
+   
+    
 
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -89,17 +69,26 @@ public class Bird : MonoBehaviour
 
         else if (collision.CompareTag("finishLine"))
         {
-            congratulations();
+            congratulations = true;
+            Congratulations();
 
         }
     }
 
-    private void congratulations()
+    private void Congratulations()
     {
         winPanel.SetActive(true);
         rb.bodyType = RigidbodyType2D.Kinematic;
-        gameOver = true;
-        // go to next scene for next level
+        rb.velocity = Vector2.zero;
+        string sceneName = SceneManager.GetActiveScene().name;
+
+        if (sceneName != "Level 3")
+        {
+
+
+            UiManager.Instance.LoadNextScene();
+        }
+
     }
 
 
@@ -108,6 +97,5 @@ private void GameOver()
         gameOverPanel.SetActive(true);
         rb.bodyType = RigidbodyType2D.Kinematic;
         gameOver = true;
-
     }
 }

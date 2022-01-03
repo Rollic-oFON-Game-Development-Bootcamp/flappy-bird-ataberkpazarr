@@ -38,14 +38,14 @@ public class LevelProgressBar : MonoBehaviour
 
     }
 
-    // Start is called before the first frame update
+
     void Start()
     {
         endLinePosition = endLineTransform.position; // since it is constant, it is better to cache it rather than taking it at every frame
         DistanceAtBeginning = GetDistance();
     }
 
-    // Update is called once per frame
+
     void Update()
     {
         float newDistance = GetDistance();
